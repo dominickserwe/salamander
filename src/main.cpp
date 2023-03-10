@@ -10,20 +10,29 @@
 
 #include <SDL.h>
 
+struct Entity {
+    int id;
+
+    float x;
+    float y;
+
+    GridBody body;
+};
+
 int main(int argc, char **argv) {
 
     Input input;
-    
+
     Platform platform("SAL", 1280, 720);
     Renderer renderer(platform.get_renderer());
 
     World world(1280, 720, 32);
 
-    float vx = 0;
-    float vy = 0;
+    Entity player = {};
+    player.body.x = 2;
+    player.body.y = 2;
 
-    float x = 2;
-    float y = 2;
+    world.add_body(&player.body);
 
     int counter = 0;
 
@@ -37,26 +46,16 @@ int main(int argc, char **argv) {
             world.toggle_solid_tile(mx / world.get_tile_size(), my / world.get_tile_size());
         }
 
-        vx = input.is_key_down('d') - input.is_key_down('a');
-        vy = input.is_key_down('s') - input.is_key_down('w');
+        player.body.vx = input.is_key_down('d') - input.is_key_down('a');
+        player.body.vy = input.is_key_down('s') - input.is_key_down('w');
 
-        if (++counter >= 60) {
-            if (world.is_tile_solid(x + vx, y)) {
-                vx = 0;
-            }
+        world.step(60);
 
-            if (world.is_tile_solid(x, y + vy)) {
-                vy = 0;
-            }
-
-            x += vx;
-            y += vy;
-
-            counter = 0;
-        }
+        player.x = player.body.x * world.get_tile_size();
+        player.y = player.body.y * world.get_tile_size();
 
         world.draw_grid(renderer, 0);
-        renderer.push_rectangle({ x * world.get_tile_size(), y * world.get_tile_size(), (float)world.get_tile_size(), (float)world.get_tile_size() }, { 96, 0, 255, 255 }, 0);
+        renderer.push_rectangle({ player.x, player.y, (float)world.get_tile_size(), (float)world.get_tile_size() }, { 96, 0, 255, 255 }, 0);
 
         renderer.present();
     }

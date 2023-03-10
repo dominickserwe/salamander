@@ -8,6 +8,25 @@ World::World(int width, int height, int tile_size) {
     m_tile_size = tile_size;
 }
 
+void World::step(int speed) {
+    if (++m_counter < speed) return;
+
+    for (auto body : m_bodies) {
+        if (is_tile_solid(body->x + body->vx, body->y)) {
+            body->vx = 0;
+        }
+
+        if (is_tile_solid(body->x, body->y + body->vy)) {
+            body->vy = 0;
+        }
+
+        body->x += body->vx;
+        body->y += body->vy;
+    }
+
+    m_counter = 0;
+}
+
 void World::toggle_solid_tile(int tx, int ty) {
     if ((tx * m_tile_size) < 0 || (tx * m_tile_size >= m_width) || (ty * m_tile_size) < 0 || (ty * m_tile_size) >= m_height) {
         return;
