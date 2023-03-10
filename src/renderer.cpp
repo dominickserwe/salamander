@@ -51,8 +51,11 @@ void Renderer::push_rectangle(SDL_FRect destination, SDL_Color color, float dept
 }
 
 void Renderer::push_texture(SDL_Texture *texture, SDL_FRect destination, SDL_Color color, float depth) {
-    //TODO: what happens when texture is null? should we draw a solid quad, or a special texture.
-    // rn it will draw a solid quad when texture is null.
+    //TODO: currently drawing pink quad if no texture is given, SDL defaults to not drawing anything
+    if (!texture) {
+        push_rectangle(destination, { 255, 0, 255, color.a }, depth);
+        return;
+    }
 
     auto texture_data = new TextureData;
 
